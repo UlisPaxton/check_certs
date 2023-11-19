@@ -1,0 +1,20 @@
+---
+- hosts: "all"
+  gather_facts: yes
+  become: yes
+
+  vars:
+    notify_threshold: 30  # за сколько дней до истечения сертификата следует уведомлять
+    cert_paths: # список сертификатов для проверки срока действия
+      - /etc/kubernetes/pki/apiserver.crt
+      - /etc/kubernetes/pki/apiserver-etcd-client.crt
+      - /etc/kubernetes/pki/apiserver-kubelet-client.crt
+      - /etc/kubernetes/pki/ca.crt
+      - /etc/kubernetes/pki/front-proxy-ca.crt
+      - /etc/kubernetes/pki/front-proxy-client.crt
+
+  tasks:
+    - name: cert info
+      include: spb_date_operations.yaml
+      with_items: "{{ cert_paths }}"
+

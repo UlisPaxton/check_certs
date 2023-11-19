@@ -1,0 +1,10 @@
+    - name: get_cert_info
+      shell: "openssl x509 -in {{ item }} -text | grep 'Not After' | awk '{print $4 \" \" $5 \" \" $7}'"
+      register: cert_info
+
+    - set_fact:
+        days: "{{ ( (cert_info.stdout | to_datetime('%b %d %Y')).date() - (ansible_date_time.date | to_datetime('%Y-%m-%d') ).date() ).days  }}"
+
+    - debug:  # тут нужно придумать, каким образом уведомлять.
+        msg: " {{ ansible_host }} -- {{ item }} осталось {{ days  }}"
+      when: days | int  < notify_threshold
